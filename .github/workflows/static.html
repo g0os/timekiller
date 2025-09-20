@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TimeKiller</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI'; background: linear-gradient(135deg, #667eea, #764ba2); min-height: 100vh; color: white; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; margin-bottom: 40px; }
+        .logo { font-size: 3rem; font-weight: bold; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .activities { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+        .card { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 20px; padding: 25px; text-align: center; transition: transform 0.3s ease; border: 1px solid rgba(255,255,255,0.2); }
+        .card:hover { transform: translateY(-5px); }
+        .icon { font-size: 2.5rem; margin-bottom: 15px; }
+        .title { font-size: 1.3rem; font-weight: bold; margin-bottom: 10px; }
+        .btn { background: linear-gradient(45deg, #ff6b6b, #ee5a52); color: white; border: none; padding: 10px 25px; border-radius: 25px; cursor: pointer; font-weight: bold; margin: 5px; }
+        .btn:hover { transform: scale(1.05); }
+        .game { background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 20px; padding: 25px; margin-top: 20px; text-align: center; }
+        .hidden { display: none; }
+        .score { font-size: 1.3rem; font-weight: bold; margin: 15px 0; }
+        .fact { background: rgba(255,255,255,0.2); padding: 20px; border-radius: 15px; margin: 15px 0; font-size: 1.1rem; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+        .quiz-opt { background: rgba(255,255,255,0.1); border: 2px solid transparent; color: white; padding: 12px; border-radius: 8px; cursor: pointer; margin: 5px 0; transition: 0.3s; }
+        .quiz-opt:hover { background: rgba(255,255,255,0.2); border-color: white; }
+        .correct { background: rgba(76,175,80,0.3) !important; border-color: #4CAF50 !important; }
+        .wrong { background: rgba(244,67,54,0.3) !important; border-color: #f44336 !important; }
+        input { padding: 12px; border: none; border-radius: 8px; margin: 8px; text-align: center; font-size: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="logo">⏰ TimeKiller (BETA)</h1>
+            <p>Скоротай время с пользой и удовольствием!</p>
+        </div>
+
+        <div class="activities">
+            <div class="card">
+                <div class="icon">🎯</div>
+                <h3 class="title">Тест на реакцию</h3>
+                <p>Проверь скорость реакции!</p>
+                <button class="btn" onclick="game1()">Начать</button>
+            </div>
+            <div class="card">
+                <div class="icon">🧠</div>
+                <h3 class="title">Викторина</h3>
+                <p>25 интересных вопросов!</p>
+                <button class="btn" onclick="game2()">Начать</button>
+            </div>
+            <div class="card">
+                <div class="icon">🔮</div>
+                <h3 class="title">Случайный факт</h3>
+                <p>30+ удивительных фактов!</p>
+                <button class="btn" onclick="game3()">Узнать</button>
+            </div>
+            <div class="card">
+                <div class="icon">🎲</div>
+                <h3 class="title">Угадай число</h3>
+                <p>Число от 1 до 100!</p>
+                <button class="btn" onclick="game4()">Играть</button>
+            </div>
+            <div class="card">
+                <div class="icon">⚡</div>
+                <h3 class="title">Математика</h3>
+                <p>Решай примеры на скорость!</p>
+                <button class="btn" onclick="game5()">В бой!</button>
+            </div>
+            <div class="card">
+                <div class="icon">🌈</div>
+                <h3 class="title">Запомни цвета</h3>
+                <p>Тренировка памяти!</p>
+                <button class="btn" onclick="game6()">Начать</button>
+            </div>
+            <div class="card">
+                <div class="icon">🔤</div>
+                <h3 class="title">Собери слово</h3>
+                <p>Составь слово из букв!</p>
+                <button class="btn" onclick="game7()">Начать</button>
+            </div>
+            <div class="card">
+                <div class="icon">🎨</div>
+                <h3 class="title">Рисование (BETA)</h3>
+                <p>Виртуальный холст!</p>
+                <button class="btn" onclick="game8()">Рисовать</button>
+            </div>
+        </div>
+
+        <div id="area" class="game hidden"></div>
+    </div>
+
+    <script>
+        let s = {};
+        const facts = ["Октопусы имеют три сердца! 🐙","Венера: день длиннее года! ☀️","Мёд не портится тысячи лет! 🍯","Бананы - ягоды, клубника - нет! 🍌","Акулы старше деревьев! 🦈","В космосе металлы свариваются! 🚀","Мозг = 20-ваттная лампочка! 🧠","Кошки не чувствуют сладкое! 🐱","Дельфины дают имена! 🐬","Жираф: язык 50см, фиолетовый! 🦒","Креветки видят 16 цветов! 🦐","Пингвины прыгают 3м! 🐧","Ленивцы спускаются раз в неделю! 🦥","Слоны боятся пчёл! 🐘","Фламинго розовые от креветок! 🦩","У улиток 25000 зубов! 🐌","Стрекозы: 95% успех охоты! 🪰","Коалы спят 22 часа! 🐨","Попугаи живут 100+ лет! 🦜","Хамелеоны меняют цвет для связи! 🦎","У кальмаров 3 сердца! 🦑","Черепахи дышат попой! 🐢","Антарктида: кровавые водопады! ❄️","Алмаз горит при 700°C! 💎","Молния в 5 раз горячее Солнца! ⚡","Облако весит как 500 слонов! ☁️","Песок поёт в пустынях! 🏜️","Рыбы помнят месяцами! 🐠","Сердце кита = вес машины! 🐋","Теряем 100 волос/день! 💇","Почти половина всех газет мира издаётся в Соединенных Штатах и Канаде.🗞️","Если во время резки лука жевать жевательную резинку, то вы не будете плакать.🧅"];
+        const quiz = [{q:"Ближайшая планета к Солнцу?",o:["Венера","Меркурий","Марс","Земля"],c:1},{q:"Костей у человека?",o:["106","206","306","156"],c:1},{q:"Apple основана в:",o:["1975","1976","1977","1974"],c:1},{q:"Символ золота?",o:["Al","Ag","Au","Cu"],c:2},{q:"Столица Австралии?",o:["Сидней","Мельбурн","Канберра","Перт"],c:2},{q:"Самое быстрое животное?",o:["Лев","Гепард","Антилопа","Леопард"],c:1},{q:"Океанов на Земле:",o:["4","5","6","3"],c:1},{q:"Самая длинная река?",o:["Нил","Амазонка","Миссисипи","Янцзы"],c:0},{q:"Высадка на Луну:",o:["1968","1969","1970","1971"],c:1},{q:"Основной газ атмосферы?",o:["O₂","CO₂","N₂","H₂"],c:2},{q:"Высочайшая гора?",o:["К2","Эверест","Канченджанга","Лхоцзе"],c:1},{q:"Крупнейшее млекопитающее?",o:["Слон","Синий кит","Жираф","Медведь"],c:1},{q:"Сердец у осьминога:",o:["1","2","3","4"],c:2},{q:"Жидкий металл:",o:["Свинец","Ртуть","Олово","Цинк"],c:1},{q:"Конец ВМВ:",o:["1944","1945","1946","1943"],c:1},{q:"Красная планета:",o:["Венера","Марс","Юпитер","Сатурн"],c:1},{q:"'Война и мир' автор:",o:["Достоевский","Толстой","Чехов","Пушкин"],c:1},{q:"Самый твёрдый материал:",o:["Сталь","Алмаз","Кварц","Титан"],c:1},{q:"Минут в сутках:",o:["1440","1420","1460","1400"],c:0},{q:"Статую Свободы подарила:",o:["Англия","Франция","Испания","Италия"],c:1},{q:"Арахнофобия - боязнь:",o:["Высоты","Пауков","Замкнутости","Толпы"],c:1},{q:"Инсулин вырабатывает:",o:["Печень","Поджелудочная","Почки","Сердце"],c:1},{q:"Берлинская стена пала:",o:["1987","1988","1989","1990"],c:2},{q:"Мини-государство:",o:["Монако","Ватикан","Сан-Марино","Лихтенштейн"],c:1},{q:"Камер в сердце:",o:["2","3","4","5"],c:2}];
+        
+        function show(h) { document.getElementById('area').innerHTML = h; document.getElementById('area').classList.remove('hidden'); }
+        function hide() { document.getElementById('area').classList.add('hidden'); }
+        
+        function game1() { // Реакция
+            const colors = ['#f44','#4f4','#44f','#fa4']; let times = [];
+            show(`<h2>🎯 Тест реакции</h2><p>Нажми при смене цвета!</p><div id="c" style="width:180px;height:180px;border-radius:50%;background:${colors[0]};margin:20px auto;cursor:pointer"></div><div id="r"></div><button class="btn" onclick="hide()">Закрыть</button>`);
+            const circle = document.getElementById('c'); let start;
+            function round() { setTimeout(() => { circle.style.background = colors[Math.floor(Math.random()*4)]; start = Date.now(); }, Math.random()*3000+1000); }
+            circle.onclick = () => { if(start) { const t = Date.now()-start; times.push(t); const avg = times.reduce((a,b)=>a+b)/times.length; document.getElementById('r').innerHTML = `<div class="score">${t}мс | Среднее: ${Math.round(avg)}мс | Попыток: ${times.length}</div>`; start=null; round(); } };
+            round();
+        }
+        
+        function game2() { s.qn=0; s.sc=0; nextQ(); } // Викторина
+        function nextQ() {
+            if(s.qn >= quiz.length) { show(`<h2>🧠 Результат</h2><div class="score">${s.sc}/${quiz.length}</div><button class="btn" onclick="game2()">Ещё</button><button class="btn" onclick="hide()">Закрыть</button>`); return; }
+            const q = quiz[s.qn]; show(`<h2>🧠 Вопрос ${s.qn+1}/${quiz.length}</h2><div class="score">Очки: ${s.sc}</div><p>${q.q}</p>${q.o.map((o,i)=>`<div class="quiz-opt" onclick="ans(${i})">${o}</div>`).join('')}`);
+        }
+        function ans(sel) {
+            const q = quiz[s.qn]; const opts = document.querySelectorAll('.quiz-opt');
+            opts[sel].classList.add(sel===q.c?'correct':'wrong'); if(sel!==q.c) opts[q.c].classList.add('correct');
+            if(sel===q.c) s.sc++; opts.forEach(o=>o.disabled=true);
+            setTimeout(()=>{s.qn++; nextQ();}, 1500);
+        }
+        
+        function game3() { show(`<h2>🔮 Факт</h2><div class="fact">${facts[Math.floor(Math.random()*facts.length)]}</div><button class="btn" onclick="game3()">Ещё!</button><button class="btn" onclick="hide()">Закрыть</button>`); } // Факты
+        
+        function game4() { // Угадай число
+            s.target = Math.floor(Math.random()*100)+1; s.attempts = 0;
+            show(`<h2>🎲 Угадай число 1-100</h2><input type="number" id="g" min="1" max="100" placeholder="Число"><br><button class="btn" onclick="check()">Угадать</button><div id="res"></div><div class="score">Попыток: <span id="cnt">0</span>/7</div><button class="btn" onclick="hide()">Закрыть</button>`);
+            document.getElementById('g').onkeypress = e => { if(e.key==='Enter') check(); };
+        }
+        function check() {
+            const g = parseInt(document.getElementById('g').value); if(!g||g<1||g>100) return;
+            s.attempts++; document.getElementById('cnt').textContent = s.attempts;
+            const res = document.getElementById('res');
+            if(g === s.target) { res.innerHTML = `<p style="color:#4f4">🎉 Угадал за ${s.attempts} попыток!</p>`; document.getElementById('g').disabled=true; }
+            else if(s.attempts >= 7) { res.innerHTML = `<p style="color:#f44">😞 Было ${s.target}</p>`; document.getElementById('g').disabled=true; }
+            else { res.innerHTML = `<p style="color:#fa4">Моё число ${g<s.target?'больше':'меньше'}!</p>`; }
+            document.getElementById('g').value = '';
+        }
+        
+        function game5() { // Математика
+            s.score = 0; s.time = 60; s.level = 1;
+            show(`<h2>⚡ Математика</h2><div class="score">Очки: <span id="sc">0</span> | <span id="tm">60</span>с</div><div id="prob" style="font-size:2rem;margin:15px 0"></div><input type="number" id="ans" placeholder="?"><br><button class="btn" onclick="checkMath()">Ответ</button><div id="mres"></div><button class="btn" onclick="hide()">Закрыть</button>`);
+            s.interval = setInterval(() => { s.time--; document.getElementById('tm').textContent = s.time; if(s.time <= 0) endMath(); }, 1000);
+            document.getElementById('ans').onkeypress = e => { if(e.key==='Enter') checkMath(); };
+            newProb();
+        }
+        function newProb() {
+            let a=Math.floor(Math.random()*20)+1, b=Math.floor(Math.random()*20)+1, op='+', ans=a+b;
+            if(s.level>3) { a=Math.floor(Math.random()*12)+1; b=Math.floor(Math.random()*12)+1; op='×'; ans=a*b; }
+            s.ans = ans; document.getElementById('prob').textContent = `${a} ${op} ${b} = ?`;
+        }
+        function checkMath() {
+            const a = parseInt(document.getElementById('ans').value); const res = document.getElementById('mres');
+            if(a === s.ans) { s.score += s.level*10; res.innerHTML = '<p style="color:#4f4">✅</p>'; if(s.score%50===0) s.level++; }
+            else { res.innerHTML = `<p style="color:#f44">❌ ${s.ans}</p>`; }
+            document.getElementById('sc').textContent = s.score; document.getElementById('ans').value = '';
+            setTimeout(() => { res.innerHTML = ''; newProb(); }, 800);
+        }
+        function endMath() { clearInterval(s.interval); show(`<h2>⚡ Финиш!</h2><div class="score">Очки: ${s.score}</div><button class="btn" onclick="game5()">Ещё</button><button class="btn" onclick="hide()">Закрыть</button>`); }
+        
+        function game6() { // Память
+            const colors = ['#f44','#4f4','#44f','#fa4']; s.seq = []; s.level = 1;
+            show(`<h2>🌈 Память</h2><div class="score">Уровень: <span id="lv">1</span></div><p id="inst">Запоминай цвета!</p><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;max-width:160px;margin:20px auto">${colors.map((c,i)=>`<div id="m${i}" style="width:70px;height:70px;background:${c};border-radius:8px;cursor:pointer" onclick="clickMem(${i})"></div>`).join('')}</div><button class="btn" onclick="startMem()">Начать</button><button class="btn" onclick="hide()">Закрыть</button>`);
+        }
+        function startMem() {
+            s.seq.push(Math.floor(Math.random()*4)); s.player = [];
+            document.getElementById('inst').textContent = 'Смотри!';
+            for(let i=0;i<4;i++) document.getElementById(`m${i}`).style.pointerEvents = 'none';
+            s.seq.forEach((c,i) => {
+                setTimeout(() => {
+                    const cell = document.getElementById(`m${c}`); cell.style.transform = 'scale(1.2)'; cell.style.boxShadow = '0 0 15px white';
+                    setTimeout(() => { cell.style.transform = 'scale(1)'; cell.style.boxShadow = 'none';
+                        if(i === s.seq.length-1) setTimeout(() => { document.getElementById('inst').textContent = 'Повтори!'; for(let j=0;j<4;j++) document.getElementById(`m${j}`).style.pointerEvents = 'all'; }, 400);
+                    }, 500);
+                }, (i+1)*700);
+            });
+        }
+        function clickMem(c) {
+            s.player.push(c); const cell = document.getElementById(`m${c}`);
+            cell.style.transform = 'scale(1.1)'; setTimeout(() => cell.style.transform = 'scale(1)', 150);
+            const idx = s.player.length-1; if(s.player[idx] !== s.seq[idx]) { document.getElementById('inst').textContent = `Ошибка! Уровень ${s.level}`; for(let i=0;i<4;i++) document.getElementById(`m${i}`).style.pointerEvents = 'none'; return; }
+            if(s.player.length === s.seq.length) { s.level++; document.getElementById('lv').textContent = s.level; document.getElementById('inst').textContent = 'Отлично!'; setTimeout(() => startMem(), 1200); }
+        }
+        
+        function game7() { // Слова
+            const words = ['КОМПЬЮТЕР','ИНТЕРНЕТ','ПРОГРАММА','КЛАВИАТУРА','МОНИТОР','ПРИНТЕР','БРАУЗЕР','ТЕЛЕФОН','ПЛАНШЕТ','НОУТБУК'];
+            s.word = words[Math.floor(Math.random()*words.length)]; s.scrambled = s.word.split('').sort(()=>Math.random()-0.5).join(''); s.selected = [];
+            show(`<h2>🔤 Слово</h2><p>Составь: <strong>${s.word}</strong></p><div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:15px 0">${s.scrambled.split('').map((l,i)=>`<div class="letter" onclick="selLetter(${i})" style="background:rgba(255,255,255,0.2);padding:10px 12px;border-radius:8px;cursor:pointer;font-weight:bold">${l}</div>`).join('')}</div><div id="sel" style="min-height:40px;background:rgba(255,255,255,0.1);border-radius:8px;padding:15px;margin:15px 0">Выбери буквы</div><button class="btn" onclick="checkWord()">Проверить</button><button class="btn" onclick="clearSel()">Очистить</button><div id="wres"></div><button class="btn" onclick="hide()">Закрыть</button>`);
+        }
+        function selLetter(i) {
+            const letters = document.querySelectorAll('.letter'); const l = letters[i];
+            if(s.selected.includes(i)) { s.selected = s.selected.filter(x=>x!==i); l.style.background = 'rgba(255,255,255,0.2)'; }
+            else { s.selected.push(i); l.style.background = 'rgba(255,107,107,0.6)'; }
+            document.getElementById('sel').textContent = s.selected.map(x=>s.scrambled[x]).join('') || 'Выбери буквы';
+        }
+        function clearSel() { s.selected = []; document.querySelectorAll('.letter').forEach(l => l.style.background = 'rgba(255,255,255,0.2)'); document.getElementById('sel').textContent = 'Выбери буквы'; }
+        function checkWord() {
+            const w = s.selected.map(i=>s.scrambled[i]).join('');
+            document.getElementById('wres').innerHTML = w === s.word ? '<p style="color:#4f4">🎉 Правильно!</p>' : `<p style="color:#f44">❌ Правильно: ${s.word}</p>`;
+        }
+        
+        function game8() { // Рисование
+            show(`<h2>🎨 Рисование</h2><canvas id="canv" width="500" height="300" style="border:2px solid white;border-radius:8px;background:white;cursor:crosshair;display:block;margin:15px auto"></canvas><div style="margin:15px 0">${['#000','#f00','#0f0','#00f','#ff0','#f0f','#0ff'].map(c=>`<div onclick="setColor('${c}')" style="width:30px;height:30px;background:${c};border-radius:50%;display:inline-block;margin:0 5px;cursor:pointer;border:2px solid ${c==='#000'?'white':'transparent'}"></div>`).join('')}</div><button class="btn" onclick="clearCanv()">Очистить</button><button class="btn" onclick="hide()">Закрыть</button>`);
+            const canvas = document.getElementById('canv'); const ctx = canvas.getContext('2d');
+            let drawing = false; let color = '#000';
+            canvas.onmousedown = e => { drawing = true; const rect = canvas.getBoundingClientRect(); ctx.beginPath(); ctx.moveTo(e.clientX-rect.left, e.clientY-rect.top); };
+            canvas.onmousemove = e => { if(drawing) { const rect = canvas.getBoundingClientRect(); ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.lineCap = 'round'; ctx.lineTo(e.clientX-rect.left, e.clientY-rect.top); ctx.stroke(); } };
+            canvas.onmouseup = () => drawing = false;
+            window.setColor = c => { color = c; document.querySelectorAll('div[onclick*="setColor"]').forEach(d => d.style.border = d.style.background === c ? '2px solid white' : '2px solid transparent'); };
+            window.clearCanv = () => ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+    </script>
+</body>
+</html>
